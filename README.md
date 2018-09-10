@@ -1,7 +1,7 @@
-## HatedInTheNation
+## Hated In The Nation
 A twitter dashboard that allows you to see who is most/least popular. 
 It was inspired from the black mirror episode called "hated in the nation".
-The current stable version is deployed at [hatedinthenation.com](https://hatedinthenation.com) for you convenience.
+The current stable version is deployed at [hatedinthenation.com](https://hatedinthenation.com) for your convenience.
 
 #### Features
 * See in (almost) realtime the most/least popular politicians, reality tv stars, etc.
