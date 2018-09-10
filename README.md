@@ -10,6 +10,9 @@ The current stable version is deployed at [hatedinthenation.com](https://hatedin
 * State by state breakdown of results. (Australian states only)
 * Python/Docker backend with Vue.js and materialize.css frontend.
 
+## Installation Instructions
+#### Coming Soon...
+
 ## License
 This is released under a GPL v3 license. Please read the included license file and abide by the terms.
 
