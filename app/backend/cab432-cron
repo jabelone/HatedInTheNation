@@ -1,0 +1,4 @@
+# Crontab for CAB432 Assessment (individual project)
+# Student Name: Jaimyn Mayer (n9749331)
+
+* * * * * wget localhost:8000/crontab/twitter >> /var/log/cron.log 2>&1

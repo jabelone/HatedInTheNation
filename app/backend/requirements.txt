@@ -1,0 +1,6 @@
+uwsgi
+flask
+flask-cors
+python-twitter
+peewee
+requests
