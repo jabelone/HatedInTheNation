@@ -1,0 +1,51 @@
+nav {
+  position: fixed;
+  top: 0;
+  z-index: 10;
+}
+
+.page-footer {
+  padding: 10px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+#logo {
+  max-width: 100px;
+}
+
+html, h1, h2, h3, h4, h5 {
+  font-family: 'Omnes Regular', Roboto, sans-serif;
+}
+
+div, span, a, p {
+  font-family: 'Omnes Medium', Roboto, sans-serif;
+}
+
+#app {
+  margin-bottom: 80px;
+  margin-top: 64px;
+}
+
+.data_table_wrapper {
+  margin-top: 10px;
+}
+
+#data_table {
+  min-height: 72vh;
+}
+
+th {
+  border-radius: 0;
+}
+
+.table-buttons {
+  margin: 2px;
+}
+
+#data_table_filter > label > input[type="search"]:focus {
+  border-bottom: 1px solid #03a9f4;
+  box-shadow: 0 1px 0 0 #03a9f4;
+}

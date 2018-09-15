@@ -1,43 +1,51 @@
-<!DOCTYPE html>
+<!--
+Main frontend template code for CAB432 Assessment (individual project)
+Student Name: Jaimyn Mayer (n9749331)
+-->
+
 <html>
 <head>
-    <meta charset=utf-8>
-    <meta name=viewport content="width=device-width,initial-scale=1">
-    <title>Hated in the Nation - (un)popularity dashboard.</title>
+  <meta charset=utf-8>
+  <meta name=viewport content="width=device-width,initial-scale=1">
+  <title>(Un)popularity Dashboard - Hated in the Nation</title>
 
-    <!-- Materialize CSS stylesheet and font import -->
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link rel="icon" href="/static/images/icon_reversed.ico" type="image/x-icon"/>
+
+
+  <!-- Materialize CSS stylesheet and fonts import -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/static/fonts/omnes-pro/omnes-pro.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+
+  <link href="/static/main.css" rel="stylesheet">
 
 </head>
 <body>
-<nav class="light-blue lighten-1" role="navigation">
-    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Logo</a>
-        <ul class="right hide-on-med-and-down">
-            <li><a href="/">Home</a></li>
-        </ul>
-
-        <ul id="nav-mobile" class="sidenav">
-            <li><a href="/">Home</a></li>
-        </ul>
-        <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-    </div>
+<nav class="light-blue" role="navigation">
+  <div class="nav-wrapper container">
+    <img src="/static/images/logo_reversed.png" style="height: 64px; padding: 10px;">
+    <a id="logo-container" href="#" class="brand-logo">Hated in the Nation</a>
+    <ul class="right">
+      <li><a href="/">Home</a></li>
+      <li><a href="/tweets">Tweets</a></li>
+    </ul>
+  </div>
 </nav>
 
+<!-- Main Vue App -->
 <div id=app></div>
 
-<footer class="page-footer orange">
-    <div class="footer-copyright">
-        <div class="container">
-            Made by <a class="orange-text text-lighten-3" href="https://jaimyn.com.au">Jaimyn Mayer</a>
-        </div>
+<div class="page-footer light-blue">
+    <div class="container">
+      Made by <b><a class="white-text" href="https://jaimyn.com.au">Jaimyn Mayer</a></b> for CAB432 at QUT
     </div>
-</footer>
+</div>
 
 <!-- Materialize CSS JavaScript import -->
 <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-<script src="/static/js/init.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
 
 </body>
 </html>
