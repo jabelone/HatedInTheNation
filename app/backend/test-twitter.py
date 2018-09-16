@@ -22,11 +22,11 @@ follow_tags = [
     },
 ]
 
-twitter = t.twitter_scraper(follow_tags, 1)
+twitter = t.TwitterScraper(follow_tags, 1)
 
 while True:
     # this will scrap tweets from the api, pull out users/locations, run sentiment analysis and save to our db
     twitter.scrape_twitter()
 
     # wait for a bit so we don't hit twitter's rate limit
-    time.sleep(30)
+    time.sleep(60)

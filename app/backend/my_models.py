@@ -35,7 +35,7 @@ class Tweet(Model):
     text = TextField(null=True)
     likes = IntegerField(default=0)
     retweets = IntegerField(default=0)
-    sentiment = TextField(default=None, null=True)
+    sentiment = DoubleField(default=None, null=True)
     emotional_analysis = TextField(default=None, null=True)
     created_date = DateTimeField(default=None, null=True)
 
