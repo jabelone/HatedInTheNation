@@ -7,7 +7,7 @@ Student Name: Jaimyn Mayer (n9749331)
 <head>
   <meta charset=utf-8>
   <meta name=viewport content="width=device-width,initial-scale=1">
-  <title>(Un)popularity Dashboard - Hated in the Nation</title>
+  <title>Unpopularity Dashboard - Hated in the Nation</title>
 
   <link rel="icon" href="/static/images/icon_reversed.ico" type="image/x-icon"/>
 
@@ -18,17 +18,21 @@ Student Name: Jaimyn Mayer (n9749331)
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
   <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
 
+   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+   integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+   crossorigin=""/>
+
   <link href="/static/main.css" rel="stylesheet">
 
 </head>
 <body>
 <nav class="light-blue" role="navigation">
   <div class="nav-wrapper container">
-    <img src="/static/images/logo_reversed.png" style="height: 64px; padding: 10px;">
-    <a id="logo-container" href="#" class="brand-logo">Hated in the Nation</a>
-    <ul class="right">
+    <img class="header-image" src="/static/images/logo_reversed.png">
+    <a id="logo-container" href="/" class="brand-logo">Hated in the Nation</a>
+    <a href="/" class="subtitle">Unpopularity Dashboard</a>
+    <ul class="right menu-links">
       <li><a href="/">Home</a></li>
-      <li><a href="/tweets">Tweets</a></li>
     </ul>
   </div>
 </nav>
@@ -46,6 +50,9 @@ Student Name: Jaimyn Mayer (n9749331)
 <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
+<script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+   integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+   crossorigin=""></script>
 
 </body>
 </html>
