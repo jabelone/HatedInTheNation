@@ -1,35 +1,17 @@
 <template>
   <div class="tags">
-    <ul class="collection">
+    <ul class="collection z-depth-1">
       <li class="collection-item">
-        <span><b>National Sentiment:</b></span>
-        <span v-if="this.data.national_sentiment < 20" class="title"> Very Low ({{this.data.national_sentiment}}%)</span>
-        <span v-else-if="this.data.national_sentiment < 40" class="title">Low ({{this.data.national_sentiment}}%)</span>
-        <span v-else-if="this.data.national_sentiment < 60" class="title">Average ({{this.data.national_sentiment}}%)</span>
-        <span v-else-if="this.data.national_sentiment < 80" class="title">High ({{this.data.national_sentiment}}%)</span>
-        <span v-else="this.data.national_sentiment" class="title">Very High ({{this.data.national_sentiment}}%)</span>
+        <span><b>Average National Sentiment:</b></span>
+        <span v-if="this.sentiment.overall.average < 20" class="title"> Very Negative ({{this.sentiment.overall.average}}%)</span>
+        <span v-else-if="this.sentiment.overall.average < 40" class="title">Negative ({{this.sentiment.overall.average}}%)</span>
+        <span v-else-if="this.sentiment.overall.average < 60" class="title">Neutral ({{this.sentiment.overall.average}}%)</span>
+        <span v-else-if="this.sentiment.overall.average < 80" class="title">Positive ({{this.sentiment.overall.average}}%)</span>
+        <span v-else-if="this.sentiment.overall.average <= 100" class="title">Very Positive ({{this.sentiment.overall.average}}%)</span>
       </li>
 
       <li class="collection-item">
-        <span><b>Highest Sentiment:</b> {{this.data.highest_sentiment.state}}</span>
-        <span v-if="this.data.highest_sentiment.value < 20" class="title"> (Very Low {{this.data.highest_sentiment.value}}%)</span>
-        <span v-else-if="this.data.highest_sentiment.value < 40" class="title">(Low {{this.data.highest_sentiment.value}}%)</span>
-        <span v-else-if="this.data.highest_sentiment.value < 60" class="title">(Average {{this.data.highest_sentiment.value}}%)</span>
-        <span v-else-if="this.data.highest_sentiment.value < 80" class="title">(High {{this.data.highest_sentiment.value}}%)</span>
-        <span v-else="this.data.highest_sentiment.value" class="title">(Very High {{this.data.highest_sentiment.value}}%)</span>
-      </li>
-
-      <li class="collection-item">
-        <span><b>Lowest Sentiment:</b> {{this.data.lowest_sentiment.state}}</span>
-        <span v-if="this.data.lowest_sentiment.value < 20" class="title">(Very Low {{this.data.lowest_sentiment.value}}%)</span>
-        <span v-else-if="this.data.lowest_sentiment.value < 40" class="title">(Low {{this.data.lowest_sentiment.value}}%)</span>
-        <span v-else-if="this.data.lowest_sentiment.value < 60" class="title">(Average {{this.data.lowest_sentiment.value}}%)</span>
-        <span v-else-if="this.data.lowest_sentiment.value < 80" class="title">(High {{this.data.lowest_sentiment.value}}%)</span>
-        <span v-else="this.data.lowest_sentiment.value" class="title">(Very High {{this.data.lowest_sentiment.value}}%)</span>
-      </li>
-
-      <li class="collection-item">
-        <span><b>Scanned Tweets:</b> {{this.data.total_tweets}}</span>
+        <span><b>Scanned Tweets:</b> {{this.sentiment.overall.count}}</span>
       </li>
     </ul>
   </div>
@@ -38,32 +20,94 @@
 <script>
   import axios from 'axios'
 
+  let placeholder = {
+    "overall": {
+      "average": 0,
+      "count": 0
+    },
+    "states": {
+      "ACT": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "ACT",
+        "tags": {}
+      },
+      "NSW": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "NSW",
+        "tags": {}
+      },
+      "NT": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "NT",
+        "tags": {}
+      },
+      "QLD": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "QLD",
+        "tags": {}
+      },
+      "SA": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "SA",
+        "tags": {}
+      },
+      "TAS": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "TAS",
+        "tags": {}
+      },
+      "VIC": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "VIC",
+        "tags": {}
+      },
+      "WA": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "WA",
+        "tags": {}
+      }
+    },
+    "tags": {}
+  };
+
   export default {
     name: 'OverallStats',
     data() {
       return {
-        tags: [],
+        sentiment: placeholder,
         timer: '',
-        data: {
-          national_sentiment: 50,
-          total_tweets: 510,
-          lowest_sentiment: {
-            state: "QLD",
-            value: 37
-          },
-          highest_sentiment: {
-            state: "NSW",
-            value: 76
-          },
-        }
       }
     },
     methods: {
-      getTagsFromBackend() {
-        const path = 'http://localhost:5000/api/tags'; //window.location.origin + `/api/tags`
+      getSentimentFromBackend() {
+        const path = 'http://localhost:5000/api/sentiment'; //window.location.origin + `/api/sentiment`
         axios.get(path)
           .then(response => {
-            this.tags = response.data;
+            this.sentiment = response.data;
           })
           .catch(error => {
             console.log(error);
@@ -71,8 +115,8 @@
       }
     },
     mounted: function () {
-      this.getTagsFromBackend();
-      this.timer = setInterval(this.getTagsFromBackend, 2000);
+      this.getSentimentFromBackend();
+      this.timer = setInterval(this.getSentimentFromBackend, 5000);
     },
     beforeDestroy() {
       clearInterval(this.timer)

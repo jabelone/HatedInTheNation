@@ -44,29 +44,28 @@
         const path = 'http://localhost:5000/api/tweets'; //window.location.origin + `/api/tweets`
         axios.get(path)
           .then(response => {
-            this.tweets = response.data.tweets
+            this.tweets = response.data.tweets;
 
             // this clever trick causes the table init code to run after the next frame is rendered. If we do it
             // straight away the dom hasn't been updated yet so it won't be initialised properly.
             setTimeout(function () {
               $.fn.dataTable.ext.classes.sPageButton = 'table-buttons waves-effect waves-light btn blue white-text';
 
-              $('#data_table').DataTable({
-                "lengthChange": false,
+              this.table = $('#data_table').DataTable({
+                "lengthChange": true,
                 "searching": true,
                 "pageLength": 8,
-                "scrollCollapse": true,
                 "paging": true,
                 "order": [[2, 'asc']],
               });
-            }, 0)
+            }, 0);
           })
           .catch(error => {
             console.log(error)
           })
       }
     },
-    created() {
+    mounted: function () {
       this.getTweets()
     }
   }

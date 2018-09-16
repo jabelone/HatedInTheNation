@@ -1,13 +1,14 @@
 <template>
   <div class="tags">
-    <ul class="collection">
+    <ul class="collection z-depth-1">
       <li v-for="tag in tags" :key="tag.tag" class="collection-item avatar">
-        <img :src="tag.image" alt="" class="circle">
-        <span class="title">{{tag.displayname}}</span>
-        <p>Username: {{tag.tag}}</p>
-        <div style="max-width: 90%; margin: 0 auto;">
-          <a :href="'http://twitter.com/' + tag.tag" target="_blank" class="left">Profile<i class="material-icons right">link</i></a>
-          <a href="#" :onclick="'$(\'#data_table\').DataTable().search(\'' + tag.tag + '\').draw();'" class="right"> Filter &nbsp;&nbsp;&nbsp;➡</a>
+        <img :src="tag.image" alt="" class="circle z-depth-2">
+        <span class="title left"><b>#{{tag.place}} - {{tag.displayname}}</b></span><br>
+        <span class="left">Avg Sentiment: {{tag.average}}%</span><br>
+        <div class="tagbox">
+          <a :href="'http://twitter.com/' + tag.tag" target="_blank" class="left">Profile</a>
+          <span class="left">&nbsp; | &nbsp;</span>
+          <a href="#" :onclick="'$(\'#data_table\').DataTable().search(\'' + tag.tag + '\').draw();'" class="left">See Tweets &nbsp;&nbsp;&nbsp;➡</a>
         </div>
       </li>
     </ul>
@@ -21,7 +22,7 @@
     name: 'Tags',
     data() {
       return {
-        tags: [],
+        tags: '',
         timer: ''
       }
     },
@@ -39,7 +40,7 @@
     },
     mounted: function () {
       this.getTagsFromBackend();
-      this.timer = setInterval(this.getTagsFromBackend, 2000);
+      this.timer = setInterval(this.getTagsFromBackend, 5000);
     },
     beforeDestroy() {
       clearInterval(this.timer)
