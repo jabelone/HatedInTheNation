@@ -8,30 +8,34 @@ MAINTAINER Jaimyn Mayer (hello@jaimyn.com.au)
 # Update the repos and install the basics
 RUN apt-get update
 RUN apt-get install -y \
+    apt-utils \
+    curl \
     python3 \
     python3-pip \
-    cron \
-    wget \
     vim
     # vim lyfe
 
-RUN pip3 install --upgrade pip
+# add the node repo and install it, then check version
+RUN curl -sL https://deb.nodesource.com/setup_8.x | bash
+RUN apt-get update
+RUN apt-get install -y nodejs
+RUN nodejs -v
 
 # Copy our codes and stuff
 ADD /app /app
 
-# Set our default working directory
+# Set our default working directory to do node stuff
+WORKDIR /app/frontend
+RUN npm run build
+
+# Set our default working directory to install python stuff and run flask
 WORKDIR /app/backend
 
-# Install the requirements with pip
+# Upgrade pip then install the requirements
+RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 
-# copy our cron config
-RUN cp cab432-cron /etc/cron.d/cab432-cron
-RUN chmod 0644 /etc/cron.d/cab432-cron
-RUN crontab /etc/cron.d/cab432-cron
-RUN touch /var/log/cron.log
 
 # Expose our port and start our app
 EXPOSE 8000
-CMD /usr/sbin/cron -f & && uwsgi --http 0.0.0.0:8000 --module app:app --processes 1 --threads 8
+CMD uwsgi --http 0.0.0.0:8000 --module app:app --processes 1 --threads 8

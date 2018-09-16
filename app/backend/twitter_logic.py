@@ -11,6 +11,14 @@ import datetime
 
 class twitter_scraper():
     api = None  # our twitter API instance
+    # the tags to follow, only here for reference, you MUST specify at least one
+    follow_tags = [
+        {
+            "tag": "@NO_TAGS_SPECIFIED",
+            "profile": "/static/images/billshorten.jpg",
+            "displayname": "No Tags Specified"
+        }
+    ]
     microsoft_headers = {}  # the authentication header for the Microsoft API
     debug_level = False  # print some stuff if set to True
 
@@ -19,10 +27,16 @@ class twitter_scraper():
     microsoft_api = "https://australiaeast.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment"
     ibm_api = "https://gateway-syd.watsonplatform.net/tone-analyzer/api/v3/tone?version=2017-09-21"
 
-    def __init__(self, debug_level=0):
+    def __init__(self, follow_tags, debug_level=0):
         if debug_level:
             self.debug_level = debug_level
             self.debug("set debug level to: " + str(debug_level), 3)
+
+        if len(follow_tags):
+            self.follow_tags = follow_tags
+
+        else:
+            raise RuntimeError("No tags specified. You must specify tags to follow.")
 
         # all of these environment variables are needed to run
         needed_vars = (
@@ -44,10 +58,10 @@ class twitter_scraper():
 
         # init our twitter API instance
         self.api = twitter.Api(consumer_key=os.environ.get("TWITTER_CONSUMER_KEY"),
-                              consumer_secret=os.environ.get("TWITTER_CONSUMER_SECRET"),
-                              access_token_key=os.environ.get("TWITTER_ACCESS_TOKEN_KEY"),
-                              access_token_secret=os.environ.get("TWITTER_ACCESS_TOKEN_SECRET"),
-                              tweet_mode="extended")
+                               consumer_secret=os.environ.get("TWITTER_CONSUMER_SECRET"),
+                               access_token_key=os.environ.get("TWITTER_ACCESS_TOKEN_KEY"),
+                               access_token_secret=os.environ.get("TWITTER_ACCESS_TOKEN_SECRET"),
+                               tweet_mode="extended")
 
         # this ensures we only cache results for 3 seconds, meaning it shouldn't be possible to hit a rate limit.
         # this also means we get fresh data every time we hit their API.
@@ -59,7 +73,9 @@ class twitter_scraper():
             print(string.encode('utf-8'))
 
     def process_user(self, tweet):
-        user = my_models.User.get_or_create(username=tweet.user.screen_name) # try getting the user or create one if they don't exist
+        print(tweet)
+        user = my_models.User.get_or_create(
+            username=tweet.user.screen_name)  # try getting the user or create one if they don't exist
         new = user[1]  # this boolean is True if the entry was created in the db
         user = user[0]  # this is the user object
 
@@ -195,8 +211,16 @@ class twitter_scraper():
 
     def scrape_twitter(self):
         self.debug(datetime.datetime.now().strftime('%H:%M:%S') + " - scraping twitter", 1)
-        results = self.api.GetSearch(term="@billshortenmp OR @ScottMorrisonMP OR @PaulineHansonOz -filter:retweets",
-                                lang="en", result_type="mixed", include_entities=True, count=10)
+        search_term = ""
+
+        for x, tag in enumerate(self.follow_tags):
+            if x == 0:
+                search_term += tag["tag"]
+            else:
+                search_term += " OR " + tag["tag"]
+
+        search_term += " -filter:retweets"
+        results = self.api.GetSearch(term=search_term, lang="en", result_type="mixed", include_entities=True, count=10)
 
         # this one has a geocode restriction, it returns way less tweets but is guaranteed to be in Australia
         # results = api.GetSearch(term="@billshortenmp OR @ScottMorrisonMP OR @PaulineHansonOz -filter:retweets",

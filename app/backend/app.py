@@ -16,9 +16,28 @@ app = Flask(__name__,
             )
 
 # CORS config
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}, r"/crontab/*": {"origins": "*"}})
 
-twitter = t.twitter_scraper(3)
+follow_tags = [
+    {
+        "tag": "@billshortenmp",
+        "image": "/static/images/billshorten.jpg",
+        "displayname": "Bill Shorten"
+    },
+    {
+        "tag": "@ScottMorrisonMP",
+        "image": "/static/images/scottmorrison.png",
+        "displayname": "ScoMo"
+    },
+    {
+        "tag": "@PaulineHansonOz",
+        "image": "/static/images/paulinehanson.jpeg",
+        "displayname": "Pauline Pantsdown"
+    },
+]
+
+twitter = t.twitter_scraper(follow_tags, 3)
+
 
 @app.route('/api/random')
 def random_number():
@@ -47,6 +66,16 @@ def get_tweets():
         'tweets': tweets
     }
     return jsonify(response)
+
+
+@app.route('/api/tags')
+def get_follow_tags():
+    return jsonify(follow_tags)
+
+
+@app.route('/api/sentiment/overall')
+def overall_sentiment():
+    query = my_models.Tweet.select().where(my_models.Tweet.active == True).order_by(my_models.Tweet.user)
 
 
 @app.route('/crontab/twitter')
