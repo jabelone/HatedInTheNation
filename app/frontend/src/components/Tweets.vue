@@ -1,30 +1,28 @@
 <template>
-  <div class="row">
-    <div class="col s12">
-      <table id="data_table" class="highlight striped">
-        <thead>
-        <tr>
-          <th>Username</th>
-          <th>Tweet</th>
-          <th>Sentiment</th>
-          <th>Likes</th>
-          <th>Retweets</th>
-          <th>Location</th>
-        </tr>
-        </thead>
+  <div>
+    <table id="data_table" class="highlight striped">
+      <thead>
+      <tr>
+        <th>Username</th>
+        <th>Tweet</th>
+        <th>Sentiment</th>
+        <th>Likes</th>
+        <th>Retweets</th>
+        <th>Location</th>
+      </tr>
+      </thead>
 
-        <tbody>
-        <tr v-for="tweet in tweets" :key="tweet.snowflake">
-          <td>{{tweet.user}}</td>
-          <td>{{tweet.text}}</td>
-          <td>{{tweet.sentiment}}</td>
-          <td>{{tweet.likes}}</td>
-          <td>{{tweet.retweets}}</td>
-          <td>{{tweet.state}}</td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
+      <tbody>
+      <tr v-for="tweet in tweets" :key="tweet.snowflake">
+        <td>{{tweet.user}}</td>
+        <td>{{tweet.text}}</td>
+        <td>{{tweet.sentiment}}</td>
+        <td>{{tweet.likes}}</td>
+        <td>{{tweet.retweets}}</td>
+        <td>{{tweet.state}}</td>
+      </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -32,7 +30,7 @@
   import axios from 'axios'
 
   export default {
-    name: 'TableCard',
+    name: 'Tweets',
     data() {
       return {
         tweets: []
@@ -55,11 +53,11 @@
 
               $('#data_table').DataTable({
                 "lengthChange": false,
-                "search": false,
+                "searching": true,
                 "pageLength": 8,
                 "scrollCollapse": true,
                 "paging": true,
-                "order": [[ 2, 'asc' ]],
+                "order": [[2, 'asc']],
               });
             }, 0)
           })
