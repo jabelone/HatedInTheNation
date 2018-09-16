@@ -10,6 +10,7 @@ nav {
   bottom: 0;
   left: 0;
   width: 100%;
+  z-index: 1;
 }
 
 #logo {
@@ -26,15 +27,18 @@ div, span, a, p {
 
 #app {
   margin-bottom: 80px;
-  margin-top: 64px;
+  margin-top: 90px;
 }
 
-.data_table_wrapper {
-  margin-top: 10px;
+.dataTables_wrapper {
+  margin-top: 0px;
+  height: 69%;
 }
 
 #data_table {
-  min-height: 72vh;
+  height: 100%;
+  overflow: auto;
+  display: block;
 }
 
 th {
@@ -48,4 +52,77 @@ th {
 #data_table_filter > label > input[type="search"]:focus {
   border-bottom: 1px solid #03a9f4;
   box-shadow: 0 1px 0 0 #03a9f4;
+}
+
+.subtitle {
+  position: absolute;
+  color: #fff;
+  display: inline-block;
+  font-size: 1.2em;
+  padding-top: 30px;
+  margin: 0;
+}
+
+.header-image {
+  height: 90px;
+  padding: 20px;
+}
+
+nav {
+  min-height: 90px;
+}
+
+td {
+  max-width: 400px;
+}
+
+.menu-links {
+  line-height: 90px;
+}
+
+.collection .collection-item.avatar:not(.circle-clipper) > .circle, .collection .collection-item.avatar :not(.circle-clipper) > .circle {
+  top: 21px;
+}
+
+#data_table_filter {
+  display: none;
+}
+
+#mapid {
+  height: 73%;
+}
+
+.row {
+  margin-bottom: 0;
+}
+
+.title-icon {
+  font-size: 40px;
+  float: right;
+  max-width: 50px;
+}
+
+h4 {
+  padding: 0 20px;
+}
+
+.tweets-and-map {
+  display: inline-block;
+}
+
+.fade-enter-active {
+  transition: opacity 0.5s;
+  transition-delay: 0.5s;
+}
+
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}
+
+body {
+  overflow: hidden;
+}
+
+.active {
+  color: #03a9f4;
 }
