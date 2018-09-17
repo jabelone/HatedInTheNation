@@ -14,6 +14,8 @@
         <span><b>Scanned Tweets:</b> {{this.sentiment.overall.count}}</span>
       </li>
     </ul>
+    <p>Data on this page automatically updates.</p>
+    <p id="last-update">Last update at: {{this.lastUpdate}}</p>
   </div>
 </template>
 
@@ -98,13 +100,22 @@
     name: 'OverallStats',
     data() {
       return {
+        refresh: 10000,
+        lastUpdate: "none",
         sentiment: placeholder,
         timer: '',
       }
     },
     methods: {
       getSentimentFromBackend() {
-        const path = 'http://localhost:5000/api/sentiment'; //window.location.origin + `/api/sentiment`
+        let d = new Date();
+        this.lastUpdate = d.toLocaleTimeString();
+        document.getElementById("last-update").classList.add("flash-text");
+        setTimeout(function () {
+          document.getElementById("last-update").classList.remove("flash-text");
+        }, 200);
+
+        const path = window.location.origin + `/api/sentiment`;
         axios.get(path)
           .then(response => {
             this.sentiment = response.data;
@@ -116,7 +127,7 @@
     },
     mounted: function () {
       this.getSentimentFromBackend();
-      this.timer = setInterval(this.getSentimentFromBackend, 5000);
+      this.timer = setInterval(this.getSentimentFromBackend, this.refresh);
     },
     beforeDestroy() {
       clearInterval(this.timer)

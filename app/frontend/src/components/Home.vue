@@ -1,28 +1,46 @@
 <template>
   <div id="home-container">
-      <div class="z-depth-1" id="leftBar">
-        <h4>Overall Stats <i class="material-icons title-icon">equalizer</i></h4>
-        <overall-stats/>
-        <h4>Unpopularity <i class="material-icons title-icon">trending_upward</i></h4>
-        <tags/>
-        <p>The list is ranked from least to most popular and updates automatically every few seconds.</p>
+    <div class="z-depth-1" id="leftBar">
+      <h4>Unpopularity <i class="material-icons title-icon">trending_downward</i></h4>
+      <tags/>
+      <h4>Overall Stats <i class="material-icons title-icon">equalizer</i></h4>
+      <overall-stats/>
+    </div>
+    <div class="" id="rightContainer">
+      <div id="titles" class="">
+        <h4 v-on:click="showTweets = 0" v-bind:class="{ activetab: showTweets !== 0}"
+            class="waves-effect waves-light tweets-and-map">Show Tweets</h4>
+        <h4 class="waves-effect waves-light tweets-and-map">&nbsp;|&nbsp;</h4>
+        <h4 v-on:click="showTweets = 1" v-bind:class="{ activetab: showTweets !== 1 }"
+            class="waves-effect waves-light tweets-and-map">State Breakdown</h4>
+        <h4 class="waves-effect waves-light tweets-and-map">&nbsp;|&nbsp;</h4>
+        <h4 v-on:click="showTweets = 2" v-bind:class="{ activetab: showTweets !== 2 }"
+            class="waves-effect waves-light tweets-and-map">More Stats</h4>
       </div>
-      <div class="" id="rightContainer">
-        <div id="titles" class="">
-          <h4 v-on:click="showTweets = true" v-bind:class="{ active: !showTweets }"
-              class="waves-effect waves-light tweets-and-map">Show Tweets</h4>
-          <h4 class="waves-effect waves-light tweets-and-map">&nbsp;|&nbsp;</h4>
-          <h4 v-on:click="showTweets = false" v-bind:class="{ active: showTweets }"
-              class="waves-effect waves-light tweets-and-map">State Breakdown</h4>
-        </div>
 
-        <transition name="fade">
-          <tweets v-if="showTweets"/>
-        </transition>
+      <transition name="fade-tweets">
+        <tweets v-if="showTweets === 0"/>
+      </transition>
 
-        <transition name="fade">
-          <sentiment-map v-if="!showTweets"/>
-        </transition>
+      <transition name="fade">
+        <sentiment-map v-if="showTweets === 1"/>
+      </transition>
+
+      <transition name="fade">
+        <all-stats v-if="showTweets === 2"/>
+      </transition>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="modal-warning" class="modal">
+      <div class="modal-content">
+        <h4><i class="material-icons">warning</i> &nbsp;Live Data Warning</h4>
+        <p>We've collected quite a few tweets since you've been on this page. To save server resources we will stop
+          collecting new data until you refresh the page.</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Ok</a>
+      </div>
     </div>
   </div>
 </template>
@@ -33,18 +51,24 @@
   import SentimentMap from './SentimentMap'
   import axios from 'axios'
   import OverallStats from "./OverallStats";
+  import AllStats from "./AllStats";
 
   export default {
     components: {
+      AllStats,
       OverallStats,
       Tweets,
       Tags,
       SentimentMap,
+
     },
     data() {
       return {
+        refresh: 10000,
+        enableScraping: true,
+        scrapeLimit: 5,
         timer: "",
-        showTweets: false,
+        showTweets: 0,
         scrapes: 0,
       }
     },
@@ -52,16 +76,20 @@
       scrapeTags() {
         this.scrapes++;
 
-        if (this.scrapes > 20) {
+        if (this.scrapes > this.scrapeLimit) {
           clearInterval(this.timer);
-          alert("We've collected quite a few tweets since you've been on this page. To save server resources we will stop doing this untill you refresh the page.");
+          M.Modal.getInstance(document.getElementById("modal-warning")).open();
           return
         }
 
-        const path = 'http://localhost:5000/crontab/twitter'; //window.location.origin + `/api/tags`
+        const path = window.location.origin + `/crontab/twitter`;
         axios.get(path)
           .then(response => {
-            console.log("scrape tweets task: " + JSON.stringify(response.data));
+            if (response.data.success) {
+              console.log("Scraped tweets successfully.");
+            } else {
+              console.log("Scraped tweets unsuccessfully.");
+            }
           })
           .catch(error => {
             console.log(error);
@@ -69,8 +97,13 @@
       }
     },
     mounted: function () {
-      // this.scrapeTags();
-      // this.timer = setInterval(this.scrapeTags, 10000);
+      var elems = document.querySelectorAll('.modal');
+      var instances = M.Modal.init(elems, {});
+
+      if (this.enableScraping) {
+        this.scrapeTags();
+        this.timer = setInterval(this.scrapeTags, this.refresh);
+      }
     },
     beforeDestroy() {
       clearInterval(this.timer)

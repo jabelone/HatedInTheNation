@@ -41,7 +41,7 @@
         this.tweets = this.getTweetsFromBackend()
       },
       getTweetsFromBackend() {
-        const path = 'http://localhost:5000/api/tweets'; //window.location.origin + `/api/tweets`
+        const path = window.location.origin + `/api/tweets`;
         axios.get(path)
           .then(response => {
             this.tweets = response.data.tweets;
