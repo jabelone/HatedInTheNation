@@ -3,27 +3,78 @@
 </template>
 
 <script>
+  import axios from 'axios'
+
   export default {
     name: 'SentimentMap',
     data() {
       return {
+        refresh: 10000,
+        centerCoords: [-27.532239, 134.597291],
+        sentiment: "",
+        time: "",
         map: "",
-        state: {
-          qld: "",
-          nsw: "",
-          vic: "",
-          act: "",
-          tas: "",
-          sa: "",
-          nt: "",
-          wa: ""
-        }
+        state: {},
+        states: [
+          ["QLD", [-22.701750, 145.362081]],
+          ["NSW", [-30.583624, 146.536988]],
+          ["VIC", [-36.748212, 141.768837]],
+          ["ACT", [-35.438815, 150.961420]],
+          ["TAS", [-42.720286, 146.639640]],
+          ["NT", [-22.717294, 134.583124]],
+          ["SA", [-32.377240, 133.583124]],
+          ["WA", [-24.974424, 121.603931]],
+        ]
+      }
+
+    },
+    methods: {
+      getSentimentFromBackend() {
+        const path = window.location.origin + `/api/sentiment`;
+        axios.get(path)
+          .then(response => {
+            this.sentiment = response.data;
+            this.updateMap();
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      },
+
+      updateMap() {
+        // Loop through the list of states and edit the popup for each
+        Object.keys(this.sentiment.states).forEach((key) => {
+          let sentimentstate = this.sentiment.states[key];
+          let mapstate = this.state[key];
+
+          let headerContent = `<ul class=\"collection with-header no-padding leaflet-stat-box\">` +
+            `<h5 class=\"leaflet-stat-box-title\">${key}</h5>\n`;
+          let headerFooter = `</ul>`;
+
+          let content = headerContent;
+          let position = 0;
+
+          sentimentstate.tags.forEach((tag) => {
+            position++;
+            let sentiment = tag[1];
+            tag = tag[0].displayname;
+
+            content += `        <li class=\"collection-item no-padding\">\n` +
+              `            <div class=\"collection-header\"><b>#${position}</b> ${tag}: ${sentiment}%</div>\n</li>`
+          });
+
+          mapstate.content = content + headerFooter;
+          mapstate.marker.setContent(mapstate.content);
+
+        });
+
+        this.map.setView(this.centerCoords, 5);
+        this.map.invalidateSize();
       }
     },
-    methods: {},
     mounted() {
       // Init a leaflet js map and center on Australia
-      this.map = L.map('mapid').setView([-27.532239, 134.597291], 5);
+      this.map = L.map('mapid').setView(this.centerCoords, 5);
       L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
         maxZoom: 14,
@@ -31,35 +82,30 @@
         accessToken: 'pk.eyJ1IjoiamFiZWxvbmUiLCJhIjoiY2pjZDVyYjBhMDl5ZjJxbXQ2Y21nbW83NyJ9.GmU38VLHRzMb17bZMEarDg'
       }).addTo(this.map);
 
-      // Because we're using vue we need to give it a sec to render then tell it to invalidate the container's size
-      let that = this;
-      setTimeout(function () {
-        that.map.invalidateSize();
-      }, 2000);
-      //
-      let content = "<h5>Queensland</h5><p>@BillyShort: 67%</p><p>@ScoMo: 54%</p><p>@PaulinePantsdown</p>";
-      this.state.qld = L.popup({autoClose: false, closeButton: false, closeOnClick: false}).setLatLng([-20.701750, 145.362081]).setContent(content).openOn(this.map);
+      // Placeholder text to show before data is fetched from backend.
+      let content = "<h5>Fetching statistics...</h5> <div class='blue lighten-4 progress'> <div class='blue indeterminate'></div> </div>";
 
-      content = "<h5>New South Wales</h5><p>@BillyShort: 67%</p><p>@ScoMo: 54%</p><p>@PaulinePantsdown</p>";
-      this.state.nsw = L.popup({autoClose: false, closeButton: false, closeOnClick: false}).setLatLng([-30.583624, 146.536988]).setContent(content).openOn(this.map);
+      // Loop through the list of states and make a popup for each, saving to vue.js
+      this.states.forEach((item) => {
+        let stateName = item[0];
+        let coords = item[1];
 
-      content = "<h5>A.C.T.</h5><p>@BillyShort: 67%</p><p>@ScoMo: 54%</p><p>@PaulinePantsdown</p>";
-      this.state.act = L.popup({autoClose: false, closeButton: false, closeOnClick: false}).setLatLng([-35.438815, 148.961420]).setContent(content).openOn(this.map);
+        let marker = L.popup({
+          autoClose: false,
+          closeButton: false,
+          closeOnClick: false
+        }).setLatLng(coords).setContent(content);
 
-      content = "<h5>Victoria</h5><p>@BillyShort: 67%</p><p>@ScoMo: 54%</p><p>@PaulinePantsdown</p>";
-      this.state.vic = L.popup({autoClose: false, closeButton: false, closeOnClick: false}).setLatLng([-35.748212, 142.768837]).setContent(content).openOn(this.map);
+        this.map.addLayer(marker);
 
-      content = "<h5>Tasmania</h5><p>@BillyShort: 67%</p><p>@ScoMo: 54%</p><p>@PaulinePantsdown</p>";
-      this.state.tas = L.popup({autoClose: false, closeButton: false, closeOnClick: false}).setLatLng([-42.720286, 146.639640]).setContent(content).openOn(this.map);
+        this.state[stateName] = {
+          "marker": marker,
+          "content": content,
+        };
+      });
 
-      content = "<h5>South Australia</h5><p>@BillyShort: 67%</p><p>@ScoMo: 54%</p><p>@PaulinePantsdown</p>";
-      this.state.sa = L.popup({autoClose: false, closeButton: false, closeOnClick: false}).setLatLng([-32.377240, 135.045214]).setContent(content).openOn(this.map);
-
-      content = "<h5>Northern Territory</h5><p>@BillyShort: 67%</p><p>@ScoMo: 54%</p><p>@PaulinePantsdown</p>";
-      this.state.nt = L.popup({autoClose: false, closeButton: false, closeOnClick: false}).setLatLng([-18.100700, 133.423292]).setContent(content).openOn(this.map);
-
-      content = "<h5>Western Australia</h5><p>@BillyShort: 67%</p><p>@ScoMo: 54%</p><p>@PaulinePantsdown</p>";
-      this.state.wa = L.popup({autoClose: false, closeButton: false, closeOnClick: false}).setLatLng([-24.974424, 121.603931]).setContent(content).openOn(this.map);
-    }
+      this.timer = setInterval(this.getSentimentFromBackend, this.refresh);
+      this.getSentimentFromBackend();
+    },
   }
 </script>
