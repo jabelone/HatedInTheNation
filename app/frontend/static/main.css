@@ -84,8 +84,8 @@ th {
 }
 
 #data_table_filter > label > input[type="search"]:focus {
-  border-bottom: 1px solid #03a9f4;
-  box-shadow: 0 1px 0 0 #03a9f4;
+  border-bottom: 1px solid #2196F3;
+  box-shadow: 0 1px 0 0 #2196F3;
 }
 
 .subtitle {
@@ -124,22 +124,26 @@ th {
   display: inline-block;
 }
 
-.fade-enter-active {
+.fade-enter-active, .fade-leave-active, .fade-tweets-leave-active {
   transition: opacity 0.5s;
-  transition-delay: 0.6s;
+  transition-delay: 0.5s;
 }
 
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
-{
+.fade-enter, .fade-leave-to, .fade-tweets-enter, .fade-tweets-leave-to {
   opacity: 0;
+}
+
+.fade-tweets-enter-active {
+  transition: opacity 0.5s;
+  transition-delay: 2s;
 }
 
 body {
   overflow: hidden;
 }
 
-.active {
-  color: #03a9f4;
+.activetab {
+  color: #2196F3;
 }
 
 .tagbox {
@@ -155,6 +159,39 @@ body {
   left: 25px;
 }
 
-#leftBar > div:nth-child(4) > ul > li {
-  padding-left: 92px;
+.avatartag {
+  padding-left: 92px!important;
+}
+
+.collection.with-header .collection-item, .leaflet-popup-content {
+  margin: 0;
+}
+
+.leaflet-stat-box {
+  border: none;
+}
+
+.leaflet-stat-box-title {
+  padding-left: 20px;
+}
+
+.collection.with-header .collection-item {
+  padding: 10px 20px;
+}
+
+.leaflet-stat-box-item p {
+  margin: 0;
+}
+
+.no-margin {
+  margin: 0;
+}
+
+#last-update {
+  transition: font-size 0.2s;
+}
+
+.flash-text {
+  font-size: 105%;
+  background-color: rgba(0,0,0,0.1);
 }
