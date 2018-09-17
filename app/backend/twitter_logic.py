@@ -227,13 +227,18 @@ class TwitterScraper:
 
         tweet = my_models.Tweet.get_by_id(tweet.id)
 
-        # Run our sentiment analysis on the tweet and save the result to the database. TODO: Make this more robust.
-        self.debug("attempting to run sentiment analysis on: " + tweet.text.strip(), 3)
-        sentiment = requests.post(self.microsoft_api, data=json.dumps(payload), headers=self.microsoft_headers).json()
-        tweet.sentiment = sentiment["documents"][0]["score"]
-        tweet.save()
-        self.debug("sentiment analysis complete: " + str(tweet.sentiment), 2)
-        return True
+        try:
+            # Run our sentiment analysis on the tweet and save the result to the database. TODO: Make this more robust.
+            self.debug("attempting to run sentiment analysis on: " + tweet.text.strip(), 3)
+            sentiment = requests.post(self.microsoft_api, data=json.dumps(payload), headers=self.microsoft_headers).json()
+            print(sentiment)
+            tweet.sentiment = sentiment["documents"][0]["score"]
+            tweet.save()
+            self.debug("sentiment analysis complete: " + str(tweet.sentiment), 2)
+            return True
+
+        except Exception:
+            return False
 
     def scrape_twitter(self):
         """

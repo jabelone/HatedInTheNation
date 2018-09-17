@@ -27,12 +27,12 @@ follow_tags = [
     {
         "tag": "@billshortenmp",  # Twitter tag to follow/search for.
         "image": "/static/images/billshorten.jpg",  # Link to an image of the tag.
-        "displayname": "Bill Shorten"  # The friendly name displayed in the UI.
+        "displayname": "Lil Billy Shorten"  # The friendly name displayed in the UI.
     },
     {
         "tag": "@ScottMorrisonMP",
         "image": "/static/images/scottmorrison.png",
-        "displayname": "ScoMo"
+        "displayname": "Scott (Coal) Morrison"
     },
     {
         "tag": "@PaulineHansonOz",
@@ -42,7 +42,7 @@ follow_tags = [
     {
         "tag": "@TonyAbbottMHR",
         "image": "/static/images/tonyabbot.jpg",
-        "displayname": "Tony Maggot"
+        "displayname": "Tony (Onion) Abbot"
     },
 ]
 
@@ -74,10 +74,15 @@ def get_tweets():
 
     # For every tweet in the database, add it to our list to send to the front end.
     for tweet in my_models.Tweet.select():
+        if tweet.sentiment is None:
+            # This shouldn't be possible, but let's handle it anyway
+            continue
+
+
         tweets.append({
             "snowflake": tweet.snowflake,
             "text": tweet.text,
-            "sentiment": round(float(tweet.sentiment), 3),
+            "sentiment": round(tweet.sentiment * 100),
             "user": tweet.user.username,
             "state": tweet.user.state,
             "likes": tweet.likes,
@@ -186,7 +191,7 @@ def sentiment_data():
             "count": tweets.count(),
         }
 
-        # Store it in a dictinoary accessible via the tag. Makes it easier on the front end.
+        # Store it in a dictionary accessible via the tag. Makes it easier on the front end.
         tag_data[tag["tag"]] = data
 
     # Time to process all of our states.
@@ -195,8 +200,8 @@ def sentiment_data():
         tweets = my_models.Tweet.select().join(my_models.User).where(my_models.Tweet.user.state == state)
 
         # Generate a list with the number of tweets each followed tag has in this state.
-        tags = {}
-        for tag in follow_tags:
+        tags = []
+        for x, tag in enumerate(follow_tags):
             amount = tweets.select(fn.AVG(my_models.Tweet.sentiment)).where(my_models.Tweet.text.contains(tag["tag"]))
             amount = amount.scalar()
 
@@ -205,7 +210,7 @@ def sentiment_data():
             else:
                 amount = 0
 
-            tags[tag["tag"]] = amount
+            tags.append((tag, amount))
 
         # Calculate the minimum sentiment.
         minimum = tweets.select(fn.Min(my_models.Tweet.sentiment)).scalar()
@@ -234,7 +239,7 @@ def sentiment_data():
             "max": maximum,
             "average": avg,
             "count": tweets.count(),
-            "tags": tags
+            "tags": sorted(tags, key=itemgetter(1))
         }
         state_data[state] = data
 
@@ -263,7 +268,7 @@ def crontab_twitter():
     twitter.scrape_twitter()  # Scrape data :)
 
     response = {
-        'complete': True
+        'success': True
     }
 
     # Tell the frontend we're done.
