@@ -24,7 +24,7 @@ RUN nodejs -v
 # Copy our codez.
 ADD /app /app
 
-# Set our default working directory to build our front end (webpack etc.).
+# Set our default working directory to build2 our front end (webpack etc.).
 WORKDIR /app/frontend
 RUN npm run build
 
@@ -34,7 +34,6 @@ WORKDIR /app/backend
 # Upgrade pip then install the requirements.
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
-
 
 # Expose our port and start our app.
 EXPOSE 8000
