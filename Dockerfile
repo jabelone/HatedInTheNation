@@ -24,7 +24,7 @@ RUN nodejs -v
 # Copy our codez.
 ADD /app /app
 
-# Set our default working directory to build2 our front end (webpack etc.).
+# Set our default working directory to build our front end (webpack etc.).
 WORKDIR /app/frontend
 RUN npm run build
 
