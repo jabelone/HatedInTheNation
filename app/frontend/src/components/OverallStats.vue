@@ -116,8 +116,7 @@
         }, 200);
 
         const path = window.location.origin + `/api/sentiment`;
-        axios.get(path)
-          .then(response => {
+        axios.get(path).then(response => {
             this.sentiment = response.data;
           })
           .catch(error => {

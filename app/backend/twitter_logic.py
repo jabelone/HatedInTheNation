@@ -3,7 +3,8 @@
 
 import my_models
 import requests
-import json
+import nltk
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 import os
 import twitter
 import datetime
@@ -22,13 +23,10 @@ class TwitterScraper:
             "displayname": "No Tags Specified"
         }
     ]
-    microsoft_headers = {}  # the authentication header for the Microsoft API
     debug_level = False  # print some stuff if set to True
 
-    # URLs of all the endpoints we need to use.
+    # URL of the Google find place API
     find_places_api = "https://maps.googleapis.com/maps/api/place/findplacefromtext/json"
-    microsoft_api = "https://australiaeast.api.cognitive.microsoft.com/text/analytics/v2.0/sentiment"
-    ibm_api = "https://gateway-syd.watsonplatform.net/tone-analyzer/api/v3/tone?version=2017-09-21"
 
     def __init__(self, follow_tags, debug_level=0):
         """
@@ -36,6 +34,10 @@ class TwitterScraper:
         :param follow_tags:
         :param debug_level:
         """
+
+        # Init the nltk stuff
+        nltk.download('vader_lexicon')
+        self.sentimentAnalysis = SentimentIntensityAnalyzer()
 
         # If the debug level has been specified, save it to the instance.
         if debug_level:
@@ -56,7 +58,6 @@ class TwitterScraper:
             "TWITTER_ACCESS_TOKEN_KEY",
             "TWITTER_ACCESS_TOKEN_SECRET",
             "GOOGLE_FIND_PLACES",
-            "MICROSOFT_API",
         )
 
         # Check if all of the environment variables exist and raise an exception if any of them don't.
@@ -64,8 +65,6 @@ class TwitterScraper:
             if var not in os.environ:
                 self.debug("missing environment variable: " + var, 1)
                 raise RuntimeError("Missing environment variable: " + var)
-
-        self.microsoft_headers = {"Ocp-Apim-Subscription-Key": os.environ.get("MICROSOFT_API")}
 
         # Initialise our twitter API instance.
         self.api = twitter.Api(consumer_key=os.environ.get("TWITTER_CONSUMER_KEY"),
@@ -209,30 +208,22 @@ class TwitterScraper:
 
     def analyse_tweet_sentiment(self, tweet):
         """
-        This method will run Microsoft sentiment analysis on the tweet and return the result.
+        This method will run sentiment analysis on the tweet and return the result.
         :param tweet:
         :return float:
         """
-
-        # Payload to be sent to the Microsoft API. It's not batched because they count each individual "document" as
-        # a separate transaction anyway.
-        payload = {
-            "documents": [
-                {
-                    "language": "en",
-                    "id": "1",
-                    "text": tweet.full_text
-                }]
-        }
 
         tweet = my_models.Tweet.get_by_id(tweet.id)
 
         try:
             # Run our sentiment analysis on the tweet and save the result to the database. TODO: Make this more robust.
             self.debug("attempting to run sentiment analysis on: " + tweet.text.strip(), 3)
-            sentiment = requests.post(self.microsoft_api, data=json.dumps(payload), headers=self.microsoft_headers).json()
-            print(sentiment)
-            tweet.sentiment = sentiment["documents"][0]["score"]
+
+            sentiment = self.sentimentAnalysis.polarity_scores(tweet.text)['compound']
+            sentiment = (((sentiment - -1.0) * (1.0 - 0)) / (1.0 - -1.0))
+
+            tweet.sentiment = sentiment
+            print(tweet.sentiment)
             tweet.save()
             self.debug("sentiment analysis complete: " + str(tweet.sentiment), 2)
             return True

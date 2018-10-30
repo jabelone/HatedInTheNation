@@ -16,7 +16,7 @@
       <tr v-for="tweet in tweets" :key="tweet.snowflake">
         <td>{{tweet.user}}</td>
         <td>{{tweet.text}}</td>
-        <td>{{tweet.sentiment}}</td>
+        <td>{{tweet.sentiment}}%</td>
         <td>{{tweet.likes}}</td>
         <td>{{tweet.retweets}}</td>
         <td>{{tweet.state}}</td>

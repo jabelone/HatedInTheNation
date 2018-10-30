@@ -30,18 +30,6 @@
         <all-stats v-if="showTweets === 2"/>
       </transition>
     </div>
-
-    <!-- Modal Structure -->
-    <div id="modal-warning" class="modal">
-      <div class="modal-content">
-        <h4><i class="material-icons">warning</i> &nbsp;Live Data Warning</h4>
-        <p>We've collected quite a few tweets since you've been on this page. To save server resources we will stop
-          collecting new data until you refresh the page.</p>
-      </div>
-      <div class="modal-footer">
-        <a href="#!" class="modal-close waves-effect waves-green btn-flat">Ok</a>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -66,7 +54,6 @@
       return {
         refresh: 10000,
         enableScraping: true,
-        scrapeLimit: 5,
         timer: "",
         showTweets: 0,
         scrapes: 0,
@@ -75,12 +62,6 @@
     methods: {
       scrapeTags() {
         this.scrapes++;
-
-        if (this.scrapes > this.scrapeLimit) {
-          clearInterval(this.timer);
-          M.Modal.getInstance(document.getElementById("modal-warning")).open();
-          return
-        }
 
         const path = window.location.origin + `/crontab/twitter`;
         axios.get(path)

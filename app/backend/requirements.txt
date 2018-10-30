@@ -4,3 +4,4 @@ flask-cors
 python-twitter
 peewee
 requests
+nltk
