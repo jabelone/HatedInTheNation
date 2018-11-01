@@ -84,8 +84,8 @@ th {
 }
 
 #data_table_filter > label > input[type="search"]:focus {
-  border-bottom: 1px solid #2196F3;
-  box-shadow: 0 1px 0 0 #2196F3;
+  border-bottom: 1px solid #F44336;
+  box-shadow: 0 1px 0 0 #F44936;
 }
 
 .subtitle {
@@ -125,8 +125,8 @@ th {
 }
 
 .fade-enter-active, .fade-leave-active, .fade-tweets-leave-active {
-  transition: opacity 0.5s;
-  transition-delay: 0.5s;
+  transition: opacity 0.2s;
+  transition-delay: 0.2s;
 }
 
 .fade-enter, .fade-leave-to, .fade-tweets-enter, .fade-tweets-leave-to {
@@ -134,8 +134,8 @@ th {
 }
 
 .fade-tweets-enter-active {
-  transition: opacity 0.5s;
-  transition-delay: 2s;
+  transition: opacity 0.2s;
+  transition-delay: 0.2s;
 }
 
 body {
@@ -143,7 +143,7 @@ body {
 }
 
 .activetab {
-  color: #2196F3;
+  color: #F44336;
 }
 
 .tagbox {
@@ -152,7 +152,7 @@ body {
 }
 
 .current {
-  background: #64B5F6 !important;
+  background: #F44006 !important;
 }
 
 .collection .collection-item.avatar:not(.circle-clipper) > .circle, .collection .collection-item.avatar :not(.circle-clipper) > .circle {
@@ -194,4 +194,13 @@ body {
 .flash-text {
   font-size: 105%;
   background-color: rgba(0,0,0,0.1);
+}
+
+#loader {
+  margin: 0 auto;
+  display: block;
+}
+
+.hidden {
+  display: none!important;
 }
