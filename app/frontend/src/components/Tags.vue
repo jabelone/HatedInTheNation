@@ -7,7 +7,8 @@
         <div class="tagbox">
           <a :href="'http://twitter.com/' + tag.tag" target="_blank" class="left">Profile</a>
           <span class="left">&nbsp; | &nbsp;</span>
-          <a href="#" :onclick="'$(\'#data_table\').DataTable().search(\'' + tag.tag + '\').draw();'" class="left">See Tweets &nbsp;&nbsp;&nbsp;➡</a>
+          <a href="#" :onclick="'$(\'#data_table\').DataTable().search(\'' + tag.tag + '\').draw();'" class="left">See
+            Tweets &nbsp;&nbsp;&nbsp;➡</a>
         </div>
         <span class="left">Avg Sentiment: {{tag.average}}%</span><br>
       </li>
@@ -22,8 +23,50 @@
     name: 'Tags',
     data() {
       return {
-        refresh: 10000,
-        tags: '',
+        refresh: 5000,
+        tags: [
+          {
+            "average": 0,
+            "count": 0,
+            "displayname": "",
+            "image": "/static/images/avatar.png",
+            "max": 0,
+            "min": 0,
+            "place": 0,
+            "tag": ""
+          },
+          {
+            "average": 0,
+            "count": 0,
+            "displayname": "",
+            "image": "/static/images/avatar.png",
+            "max": 0,
+            "min": 0,
+            "place": 0,
+            "tag": ""
+          },
+          {
+            "average": 0,
+            "count": 0,
+            "displayname": "",
+            "image": "/static/images/avatar.png",
+            "max": 0,
+            "min": 0,
+            "place": 0,
+            "tag": ""
+          },
+          {
+            "average": 0,
+            "count": 0,
+            "displayname": "",
+            "image": "/static/images/avatar.png",
+            "max": 0,
+            "min": 0,
+            "place": 0,
+            "tag": ""
+          }
+        ]
+        ,
         timer: ''
       }
     },

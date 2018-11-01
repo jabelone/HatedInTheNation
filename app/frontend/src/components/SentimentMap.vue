@@ -1,5 +1,12 @@
 <template>
-  <div id="mapid"></div>
+  <div>
+    <div id="loader">
+      <div class="progress red">
+        <div class="indeterminate red lighten-4"></div>
+      </div>
+    </div>
+    <div id="mapid"></div>
+  </div>
 </template>
 
 <script>
@@ -35,6 +42,7 @@
           .then(response => {
             this.sentiment = response.data;
             this.updateMap();
+            document.getElementById("loader").classList.add("hidden");
           })
           .catch(error => {
             console.log(error);
@@ -65,7 +73,6 @@
 
           mapstate.content = content + headerFooter;
           mapstate.marker.setContent(mapstate.content);
-
         });
 
         this.map.setView(this.centerCoords, 5);
@@ -73,6 +80,7 @@
       }
     },
     mounted() {
+      document.getElementById("loader").classList.remove("hidden");
       // Init a leaflet js map and center on Australia
       this.map = L.map('mapid').setView(this.centerCoords, 5);
       L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -83,7 +91,7 @@
       }).addTo(this.map);
 
       // Placeholder text to show before data is fetched from backend.
-      let content = "<h5>Fetching statistics...</h5> <div class='blue lighten-4 progress'> <div class='blue indeterminate'></div> </div>";
+      let content = "<h5>Fetching statistics...</h5>";
 
       // Loop through the list of states and make a popup for each, saving to vue.js
       this.states.forEach((item) => {

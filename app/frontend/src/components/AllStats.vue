@@ -1,5 +1,11 @@
 <template>
   <div class="row left-align">
+    <div id="loader">
+      <div class="progress red">
+        <div class="indeterminate red lighten-4"></div>
+      </div>
+    </div>
+
     <div class="col s12 m4">
       <h4 class="center-align">States</h4>
       <ul class="collapsible">
@@ -63,21 +69,147 @@
       "count": 0
     },
     "states": {
-      "ACT": {
+      "#": {
         "average": 0,
         "count": 0,
         "max": 0,
         "min": 0,
-        "name": "ACT",
+        "name": "",
         "tags": {
-          "@PaulineHansonOz": {
+          "@": {
             "average": 0,
             "count": 0,
-            "displayname": "Pauline Pantsdown",
+            "displayname": "@",
             "image": "",
             "max": 0,
             "min": 0,
-            "tag": "@PaulineHansonOz"
+            "tag": "@######"
+          },
+        }
+      },
+      "##": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "",
+        "tags": {
+          "@": {
+            "average": 0,
+            "count": 0,
+            "displayname": "@",
+            "image": "",
+            "max": 0,
+            "min": 0,
+            "tag": "@######"
+          },
+        }
+      },
+      "###": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "",
+        "tags": {
+          "@": {
+            "average": 0,
+            "count": 0,
+            "displayname": "@",
+            "image": "",
+            "max": 0,
+            "min": 0,
+            "tag": "@######"
+          },
+        }
+      },
+      "####": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "",
+        "tags": {
+          "@": {
+            "average": 0,
+            "count": 0,
+            "displayname": "@",
+            "image": "",
+            "max": 0,
+            "min": 0,
+            "tag": "@######"
+          },
+        }
+      },
+      "#####": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "",
+        "tags": {
+          "@": {
+            "average": 0,
+            "count": 0,
+            "displayname": "@",
+            "image": "",
+            "max": 0,
+            "min": 0,
+            "tag": "@######"
+          },
+        }
+      },
+      "######": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "",
+        "tags": {
+          "@": {
+            "average": 0,
+            "count": 0,
+            "displayname": "@",
+            "image": "",
+            "max": 0,
+            "min": 0,
+            "tag": "@######"
+          },
+        }
+      },
+      "#######": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "",
+        "tags": {
+          "@": {
+            "average": 0,
+            "count": 0,
+            "displayname": "@",
+            "image": "",
+            "max": 0,
+            "min": 0,
+            "tag": "@######"
+          },
+        }
+      },
+      "########": {
+        "average": 0,
+        "count": 0,
+        "max": 0,
+        "min": 0,
+        "name": "",
+        "tags": {
+          "@": {
+            "average": 0,
+            "count": 0,
+            "displayname": "@",
+            "image": "",
+            "max": 0,
+            "min": 0,
+            "tag": "@######"
           },
         }
       },
@@ -99,6 +231,7 @@
         const path = window.location.origin + `/api/sentiment`;
         axios.get(path)
           .then(response => {
+            document.getElementById("loader").classList.add("hidden");
             this.sentiment = response.data;
           })
           .catch(error => {
@@ -107,6 +240,7 @@
       }
     },
     mounted: function () {
+      document.getElementById("loader").classList.remove("hidden");
       this.getSentimentFromBackend();
       this.timer = setInterval(this.getSentimentFromBackend, this.refresh);
 

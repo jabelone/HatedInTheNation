@@ -53,9 +53,9 @@
     data() {
       return {
         refresh: 10000,
-        enableScraping: true,
+        enableScraping: false,
         timer: "",
-        showTweets: 0,
+        showTweets: 1,
         scrapes: 0,
       }
     },

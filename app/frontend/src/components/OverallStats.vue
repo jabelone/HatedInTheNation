@@ -100,7 +100,7 @@
     name: 'OverallStats',
     data() {
       return {
-        refresh: 10000,
+        refresh: 5000,
         lastUpdate: "none",
         sentiment: placeholder,
         timer: '',
@@ -115,7 +115,7 @@
           document.getElementById("last-update").classList.remove("flash-text");
         }, 200);
 
-        const path = window.location.origin + `/api/sentiment`;
+        const path = window.location.origin + `/api/sentiment/`;
         axios.get(path).then(response => {
             this.sentiment = response.data;
           })

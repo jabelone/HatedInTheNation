@@ -1,5 +1,10 @@
 <template>
   <div>
+    <div id="loader">
+      <div class="progress red">
+        <div class="indeterminate red lighten-4"></div>
+      </div>
+    </div>
     <table id="data_table" class="highlight striped">
       <thead>
       <tr>
@@ -49,7 +54,7 @@
             // this clever trick causes the table init code to run after the next frame is rendered. If we do it
             // straight away the dom hasn't been updated yet so it won't be initialised properly.
             setTimeout(function () {
-              $.fn.dataTable.ext.classes.sPageButton = 'table-buttons waves-effect waves-light btn blue white-text';
+              $.fn.dataTable.ext.classes.sPageButton = 'table-buttons waves-effect waves-light btn red white-text';
 
               this.table = $('#data_table').DataTable({
                 "lengthChange": true,
@@ -57,6 +62,9 @@
                 "pageLength": 8,
                 "paging": true,
                 "order": [[2, 'asc']],
+                "initComplete": function (settings, json) {
+                  document.getElementById("loader").classList.add("hidden");
+                }
               });
             }, 0);
           })
@@ -66,6 +74,7 @@
       }
     },
     mounted: function () {
+      document.getElementById("loader").classList.remove("hidden");
       this.getTweets()
     }
   }
