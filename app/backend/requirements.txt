@@ -1,7 +1,9 @@
 uwsgi
 flask
 flask-cors
+twython
 python-twitter
+pymysql
 peewee
 requests
 nltk

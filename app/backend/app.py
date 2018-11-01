@@ -3,14 +3,14 @@
 # Student Name: Jaimyn Mayer (n9749331)
 
 from flask import Flask, render_template, jsonify
-from random import *
 from flask_cors import CORS
 import twitter_logic as t
 import my_models
 from peewee import *
+from playhouse.shortcuts import model_to_dict
 from operator import itemgetter
 
-# This will create the db if it doesn't exist but won't overrite it if it already does.
+# This will create the db if it doesn't exist but won't overwrite it if it already does.
 my_models.db.create_tables([my_models.Tweet, my_models.User])
 
 app = Flask(__name__,
@@ -21,47 +21,22 @@ app = Flask(__name__,
 # CORS config - allow our API to be accessed from other domains. TODO: Turn off in production.
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}, r"/crontab/*": {"origins": "*"}})
 
-# This is a list of tags to follow and enter into the system. This list is hardcoded because the API for sentiment
-# analysis is severely restricted as we only get 5000 tweets per month.
-follow_tags = [
-    {
-        "tag": "@billshortenmp",  # Twitter tag to follow/search for.
-        "image": "/static/images/billshorten.jpg",  # Link to an image of the tag.
-        "displayname": "Lil Billy Shorten"  # The friendly name displayed in the UI.
-    },
-    {
-        "tag": "@ScottMorrisonMP",
-        "image": "/static/images/scottmorrison.png",
-        "displayname": "Scott (Coal) Morrison"
-    },
-    {
-        "tag": "@PaulineHansonOz",
-        "image": "/static/images/paulinehanson.jpeg",
-        "displayname": "Pauline Pantsdown"
-    },
-    {
-        "tag": "@TonyAbbottMHR",
-        "image": "/static/images/tonyabbot.jpg",
-        "displayname": "Tony (Onion) Abbot"
-    },
-]
-
+# Get a list of all our tags that we're following
+followed_tags = my_models.Tag.select()
 
 # Create a new instance of our twitter scraping class and give it our tags from above. Here we're setting the debug
 # level to 3. Set to 0 for no output or 1, 2 ot 3 for increasing levels of verbosity.
-twitter = t.TwitterScraper(follow_tags, 3)
+twitter = t.TwitterScraper(followed_tags, 3)
 
+@app.before_request
+def _db_connect():
+    print("connecting to db")
+    my_models.db.connect()
+    return None
 
-@app.route('/api/random')
-def random_number():
-    """
-    Generates a random number. For testing purposes.
-    :return:
-    """
-    response = {
-        'randomNumber': randint(1, 100)
-    }
-    return jsonify(response)
+@app.teardown_request
+def _db_connect(resp):
+    my_models.db.close()
 
 
 @app.route('/api/tweets')
@@ -100,10 +75,11 @@ def get_tags():
     :return:
     """
     tag_data = []
+    followed_tags = my_models.Tag.select()
 
-    for tag in follow_tags:
+    for tag in followed_tags:
         # Grab a list of all tweets the tag is mentioned in.
-        tweets = my_models.Tweet.select().join(my_models.User).where(my_models.Tweet.text.contains(tag["tag"]))
+        tweets = my_models.Tweet.select().join(my_models.User).where(my_models.Tweet.text.contains(tag.tag))
 
         # Calculate the minimum sentiment.
         minimum = tweets.select(fn.Min(my_models.Tweet.sentiment)).scalar()
@@ -127,9 +103,9 @@ def get_tags():
             avg = 0
 
         data = {
-            "tag": tag["tag"],
-            "image": tag["image"],
-            "displayname": tag["displayname"],
+            "tag": tag.tag,
+            "image": tag.image,
+            "displayname": tag.displayname,
             "min": minimum,
             "max": maximum,
             "average": avg,
@@ -156,9 +132,9 @@ def sentiment_data():
     states = ("QLD", "NSW", "VIC", "ACT", "TAS", "SA", "NT", "WA")  # For convenience later on.
 
     # Time to process all of followed tags.
-    for tag in follow_tags:
+    for tag in followed_tags:
         # Get a list of all tweets the tag is mentioned in.
-        tweets = my_models.Tweet.select().join(my_models.User).where(my_models.Tweet.text.contains(tag["tag"]))
+        tweets = my_models.Tweet.select().join(my_models.User).where(my_models.Tweet.text.contains(tag.tag))
 
         # Calculate the minimum sentiment.
         minimum = tweets.select(fn.Min(my_models.Tweet.sentiment)).scalar()
@@ -182,9 +158,9 @@ def sentiment_data():
             avg = 0
 
         data = {
-            "tag": tag["tag"],
-            "image": tag["image"],
-            "displayname": tag["displayname"],
+            "tag": tag.tag,
+            "image": tag.image,
+            "displayname": tag.displayname,
             "min": minimum,
             "max": maximum,
             "average": avg,
@@ -192,7 +168,7 @@ def sentiment_data():
         }
 
         # Store it in a dictionary accessible via the tag. Makes it easier on the front end.
-        tag_data[tag["tag"]] = data
+        tag_data[tag.tag] = data
 
     # Time to process all of our states.
     for state in states:
@@ -201,8 +177,8 @@ def sentiment_data():
 
         # Generate a list with the number of tweets each followed tag has in this state.
         tags = []
-        for x, tag in enumerate(follow_tags):
-            amount = tweets.select(fn.AVG(my_models.Tweet.sentiment)).where(my_models.Tweet.text.contains(tag["tag"]))
+        for x, tag in enumerate(followed_tags):
+            amount = tweets.select(fn.AVG(my_models.Tweet.sentiment)).where(my_models.Tweet.text.contains(tag.tag))
             amount = amount.scalar()
 
             if amount:
@@ -210,7 +186,7 @@ def sentiment_data():
             else:
                 amount = 0
 
-            tags.append((tag, amount))
+            tags.append((model_to_dict(tag), amount))
 
         # Calculate the minimum sentiment.
         minimum = tweets.select(fn.Min(my_models.Tweet.sentiment)).scalar()
@@ -267,12 +243,8 @@ def crontab_twitter():
     """
     twitter.scrape_twitter()  # Scrape data :)
 
-    response = {
-        'success': True
-    }
-
     # Tell the frontend we're done.
-    return jsonify(response)
+    return jsonify({'success': True})
 
 
 @app.route('/', defaults={'path': ''})
