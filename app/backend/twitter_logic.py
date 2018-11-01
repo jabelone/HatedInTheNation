@@ -2,6 +2,8 @@
 # Student Name: Jaimyn Mayer (n9749331)
 
 import my_models
+import peewee
+from playhouse.shortcuts import model_to_dict
 import requests
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
@@ -182,29 +184,34 @@ class TwitterScraper:
         # Process the username (add to db if not there, otherwise get instance).
         self.debug("attempting to process user: " + result.user.screen_name, 2)
         user = self.process_user(result)
+        print(result)
 
         if not user:
             return False
 
-        # Create a new tweet, or return the model instance if it exists.
-        tweet = my_models.Tweet.get_or_create(snowflake=result.id, user_id=user.username)
-
-        # If a new tweet was created add the data, save it then return it.
-        if tweet[1]:
-            tweet = tweet[0]
-            tweet.user = user
-            tweet.text = result.full_text
-            tweet.likes = result.favorite_count
-            tweet.retweets = result.retweet_count
-            tweet.save()
-
-            self.debug("saved tweet to db", 1)
-            return True
-
-        # If the tweet already exists, just exit.
-        else:
+        # Create a new tweet, or get the model instance if it exists.
+        try:
+            my_models.Tweet.get(snowflake=result.id_str, user_id=user.username)
             self.debug("tweet already exists in db", 2)
             return False
+
+        except peewee.DoesNotExist:
+            try:
+                tweet = my_models.Tweet.create(snowflake=result.id, user_id=user.username)
+
+            except peewee.IntegrityError:
+                self.debug("Integrity error when adding tweet to db.", 1)
+                return False
+
+        # If a new tweet was created add the data, save it then return it.
+        tweet.user = user
+        tweet.text = str(result.full_text)
+        tweet.likes = result.favorite_count
+        tweet.retweets = result.retweet_count
+        tweet.save()
+
+        self.debug("saved tweet to db", 1)
+        return True
 
     def analyse_tweet_sentiment(self, tweet):
         """
@@ -236,6 +243,7 @@ class TwitterScraper:
         This method utilises the Twitter API and searches for tweats that match any of the defined tags.
         :return:
         """
+        self.follow_tags = model_to_dict(my_models.Tag.select())
         self.debug(datetime.datetime.now().strftime('%H:%M:%S') + " - scraping twitter", 1)
         search_term = ""
 
@@ -248,16 +256,17 @@ class TwitterScraper:
 
         search_term += " -filter:retweets"
 
-        # This one has no geolocation boundaries, so occasionally you get international/fictional locations.
-        tweets = self.api.GetSearch(term=search_term, lang="en", result_type="mixed", include_entities=True, count=100)
+        for tag in self.follow_tags:
+            # This one has no geolocation boundaries, so occasionally you get international/fictional locations.
+            tweets = self.api.GetSearch(term=tag["tag"], lang="en", result_type="recent", include_entities=True, count=100)
 
-        # This one guarantees Australian tweets, but it returns much fewer results so use other one.
-        # results = api.GetSearch(term="@billshortenmp OR @ScottMorrisonMP OR @PaulineHansonOz -filter:retweets",
-        #                    max_id=models.Tweet.select().limit(1)[0].snowflake, geocode="-27.532239,134.597291,2200km",
-        #                    lang="en", result_type="mixed", include_entities=True, count=10)
+            # This one guarantees Australian tweets, but it returns much fewer results so use other one.
+            # results = api.GetSearch(term="@billshortenmp OR @ScottMorrisonMP OR @PaulineHansonOz -filter:retweets",
+            #                    max_id=models.Tweet.select().limit(1)[0].snowflake, geocode="-27.532239,134.597291,2200km",
+            #                    lang="en", result_type="mixed", include_entities=True, count=10)
 
-        for tweet in tweets:
-            # Attempt to add the tweet. If successful, then run sentiment analysis on it.
-            if self.add_tweet(tweet):
-                if self.analyse_tweet_sentiment(tweet):
-                    self.debug("created user, added tweet and analysed it: " + str(tweet.full_text).rstrip(), 1)
+            for tweet in tweets:
+                # Attempt to add the tweet. If successful, then run sentiment analysis on it.
+                if self.add_tweet(tweet):
+                    if self.analyse_tweet_sentiment(tweet):
+                        self.debug("created user, added tweet and analysed it: " + str(tweet.full_text).rstrip(), 1)
